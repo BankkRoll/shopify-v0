@@ -6,6 +6,7 @@ import express, { Request, Response } from "express";
 import bodyParser from "body-parser";
 import cors from "cors";
 import { functions } from "./functions";
+import { Session } from "@e2b/sdk";
 
 const app = express();
 
@@ -271,7 +272,7 @@ async function run(userTask: string, componentName: string) {
   }
   const finalLiquidCode = handleLiquidCode(liquidComponents, componentName);
   fs.writeFileSync(
-    "/shopify-v0-template/dawn/sections/section.liquid",
+    "e2b-playground/shopify-v0-template/dawn/sections/section.liquid",
     finalLiquidCode
   );
   console.log("Liquid code written.");
@@ -281,7 +282,7 @@ const shopifyDevServer: ChildProcessWithoutNullStreams = spawn(
   "shopify",
   ["theme", "dev", "--store", "your-test-store.myshopify.com"],
   {
-    cwd: "/shopify-v0-template/dawn",
+    cwd: "e2b-playground/shopify-v0-template/dawn",
   }
 );
 
@@ -293,25 +294,34 @@ shopifyDevServer.stderr.on("data", (chunk: Buffer) => {
 });
 
 async function cloneRepo() {
-  return new Promise<void>((resolve, reject) => {
-    const clone = spawn(
-      "git",
-      ["clone", "https://github.com/BankkRoll/shopify-v0-template"],
-      {
-        cwd: "/shopify-v0-template/dawn",
-      }
-    );
+  return new Promise<void>(async (resolve, reject) => {
+    try {
+      const session = await Session.create({
+        id: 'Nodejs',
+        apiKey: process.env.E2B_API_KEY,
+      });
 
-    clone.on("close", (code) => {
-      if (code !== 0) {
-        return reject(
-          new Error(`Failed to clone repository with code ${code}`)
-        );
-      }
+      let proc = await session.process.start({
+        cmd: 'git clone https://github.com/BankkRoll/shopify-v0-template e2b-playground/shopify-v0-template/dawn',
+        onStderr: data => console.log(data.line),
+        onStdout: data => console.log(data.line),
+      });
+
+      await proc.finished;
+
+      await session.close();
+
       resolve();
-    });
+    } catch (error) {
+      if (error instanceof Error) {
+        reject(new Error(`Failed to clone repository: ${error.message}`));
+      } else {
+        reject(new Error('Failed to clone repository: Unknown error occurred'));
+      }
+    }
   });
 }
+
 
 app.use(cors());
 app.use(bodyParser.json());
@@ -326,7 +336,7 @@ app.post("/", async (req: Request, res: Response) => {
 
 app.get("/", async (req: Request, res: Response) => {
   const code: string = fs.readFileSync(
-    "/shopify-v0-template/dawn/sections/section.liquid",
+    "e2b-playground/shopify-v0-template/dawn/sections/section.liquid",
     "utf8"
   );
   res.json({ code });
@@ -361,7 +371,7 @@ app.listen(3002, async () => {
         "shopify",
         ["theme", "dev", "--store", "your-test-store.myshopify.com"],
         {
-          cwd: "/shopify-v0-template/dawn",
+          cwd: "e2b-playground/shopify-v0-template/dawn",
         }
       );
 
