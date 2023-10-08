@@ -167,7 +167,7 @@ function handleLiquidCode(components: LiquidComponents, componentName: string) {
       {% comment %}
       --------------------------------------------------------------
           Section Name: ${componentName}.liquid
-          Author: shopify-v0
+          Author: shopify-v0 https://github.com/BankkRoll/shopify-v0
           License: MIT
       --------------------------------------------------------------
       {% endcomment %}
