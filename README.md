@@ -1,5 +1,8 @@
 # Shopify-v0
 
+> [!NOTE]  
+> Coming soon!
+
 ## Overview
 Welcome to Shopify-v0, a platform designed to generate advanced Shopify Liquid sections with ease. Powered by AI, our service allows you to quickly create custom Liquid sections for your Shopify store without the hassle of coding.
 
