@@ -23,5 +23,9 @@ Welcome to Shopify-v0, a platform designed to generate advanced Shopify Liquid s
 - **Next.js**: Our frontend is built using [Next.js](https://nextjs.org/), providing a fast and user-friendly web experience.
 - **Shopify Liquid**: The code generated is in [Shopify's Liquid format](https://shopify.dev/docs/themes/liquid/reference), which is easily customizable and compatible with all Shopify stores.
 
+> [!NOTE]  
+> Inspired by [v0.dev](https://v0.dev)
+> Inspired by [oss-v0](https://github.com/mlejva/oss-v0)
+
 ## License
 MIT
