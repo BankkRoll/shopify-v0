@@ -18,7 +18,8 @@ export default function Home() {
   return (
     <main className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-r from-blue-400 via-purple-500 to-pink-400 text-white">
       <div className="w-full max-w-screen-xl p-6 rounded-lg bg-black bg-opacity-30 backdrop-blur-md space-y-6">
-        <h1 className="text-4xl font-extrabold mb-4 tracking-tight text-center">Shopify Liquid Section Generator</h1>
+      <h1 className="text-4xl font-extrabold mb-4 text-center">Shopify-v0</h1>
+      <h1 className="text-1xl mb-4 tracking-tight text-center">Shopify Liquid Section Generator</h1>
 
         <div className="flex justify-between items-center gap-4">
           <input
