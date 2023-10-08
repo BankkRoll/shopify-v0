@@ -69,7 +69,7 @@ function Playground() {
           {% endschema %}
         `;
         await session.filesystem.write(
-          "/shopify-v0-template/dawn/sections/section.liquid",
+          "e2b-playground/shopify-v0-template/dawn/sections/section.liquid",
           liquidCode
         );
       };
