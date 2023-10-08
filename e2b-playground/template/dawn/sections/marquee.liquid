@@ -1,0 +1,175 @@
+{% comment %}
+--------------------------------------------------------------
+  Section Name: marquee
+  Author: BankkRoll
+  Description: Scrolling marquee for showcasing brand logos, ect.
+  GitHub: https://github.com/BankkRoll/Shopify-Section-Snippets
+  License: MIT
+--------------------------------------------------------------
+{% endcomment %}
+
+{%- style -%}
+  .marquee__item {
+    display: inline-flex;
+    flex: 1;
+    justify-content: {{ section.settings.text_alignment }};
+    align-items: center;
+    padding: {{ section.settings.item_padding }};
+    box-sizing: border-box;
+  }
+  .marquee {
+    overflow: hidden;
+    text-align: {{ section.settings.title_alignment }};
+  }
+  .marquee ul {
+    display: flex;
+    white-space: nowrap;
+    animation: marquee {{ section.settings.animation_speed }} linear infinite;
+  }
+  @keyframes marquee {
+    0% { transform: translateX(0%); }
+    100% { transform: translateX(-25%); }
+  }
+  img {
+    max-width: {{ section.settings.image_size }};
+  }
+  @media (max-width: 768px) {
+    .marquee__item {
+      padding: {{ section.settings.item_padding_mobile }};
+    }
+  }
+{%- endstyle -%}
+
+
+<h2 style="text-align: {{ section.settings.title_alignment }}">{{ section.settings.title | escape }}</h2>
+
+{%- if section.blocks.size > 0 -%}
+  <div class="marquee">
+    <ul class="marquee-content">
+      {%- for i in (1..6) -%}
+        {%- for block in section.blocks -%}
+          <li class="marquee__item" {{ block.shopify_attributes }}>
+            {%- if block.settings.link != blank -%}
+              <a href="{{ block.settings.link }}">
+            {%- endif -%}
+            {%- if block.settings.image != blank -%}
+              {{ block.settings.image | img_url: '160x160', scale: 2 | img_tag: block.settings.image.alt }}
+            {%- else -%}
+              {{ 'logo' | placeholder_svg_tag: 'placeholder-svg' }}
+            {%- endif -%}
+            {%- if block.settings.link != blank -%}
+              </a>
+            {%- endif -%}
+          </li>
+        {%- endfor -%}
+      {%- endfor -%}
+    </ul>
+  </div>
+{%- endif -%}
+
+
+{% schema %}
+{
+  "name": "Marquee",
+  "class": "index-section",
+  "max_blocks": 20,
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Marquee"
+    },
+    {
+      "type": "select",
+      "id": "animation_speed",
+      "label": "Animation Speed",
+      "default": "15s",
+      "options": [
+        { "label": "Slow", "value": "20s" },
+        { "label": "Normal", "value": "15s" },
+        { "label": "Fast", "value": "10s" }
+      ]
+    },
+    {
+      "type": "text",
+      "id": "item_padding",
+      "label": "Item Padding",
+      "default": "0 10px"
+    },
+    {
+      "type": "text",
+      "id": "item_padding_mobile",
+      "label": "Item Padding on Mobile",
+      "default": "0 5px"
+    },
+    {
+      "type": "select",
+      "id": "text_alignment",
+      "label": "Text/Image Alignment",
+      "default": "center",
+      "options": [
+        { "label": "Left", "value": "flex-start" },
+        { "label": "Center", "value": "center" },
+        { "label": "Right", "value": "flex-end" }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "title_alignment",
+      "label": "Title Alignment",
+      "default": "center",
+      "options": [
+        { "label": "Left", "value": "left" },
+        { "label": "Center", "value": "center" },
+        { "label": "Right", "value": "right" }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "image_size",
+      "label": "Image Size",
+      "default": "160px",
+      "options": [
+        { "label": "XSmall", "value": "75px" },
+        { "label": "Small", "value": "100px" },
+        { "label": "Medium", "value": "160px" },
+        { "label": "Large", "value": "200px" },
+        { "label": "XLarge", "value": "220px" },
+        { "label": "XXLarge", "value": "280px" }
+      ]
+    }
+  ],
+  "blocks": [
+    {
+      "type": "logo_image",
+      "name": "Image",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link",
+          "info": "Optional"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Marquee",
+      "category": "Image",
+      "blocks": [
+        { "type": "logo_image" },
+        { "type": "logo_image" },
+        { "type": "logo_image" },
+        { "type": "logo_image" }
+      ]
+    }
+  ]
+}
+{% endschema %}
