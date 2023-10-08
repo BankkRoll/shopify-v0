@@ -1,0 +1,7 @@
+# This is a config for a Devbook environment
+
+title = "shopify-v0"
+template = "Nodejs"
+
+[filesystem]
+local_root = "."
