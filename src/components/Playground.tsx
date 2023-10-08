@@ -1,6 +1,6 @@
 // src/components/Playground.tsx
-import { useEffect, useState } from 'react';
-import { Session } from '@e2b/sdk';
+import { useEffect, useState } from "react";
+import { Session } from "@e2b/sdk";
 
 const logger = {
   debug: console.debug,
@@ -11,18 +11,18 @@ const logger = {
 
 function Playground() {
   const [playground, setPlayground] = useState<Session | null>(null);
-  const [url, setURL] = useState<string>('');
+  const [url, setURL] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
 
   async function initPlayground() {
     setLoading(true);
     try {
       if (!process.env.NEXT_PUBLIC_E2B_API_KEY) {
-        throw new Error('E2B API key not set');
+        throw new Error("E2B API key not set");
       }
 
       const session = await Session.create({
-        id: 'Nodejs',
+        id: "Nodejs",
         apiKey: process.env.NEXT_PUBLIC_E2B_API_KEY,
         logger,
       });
@@ -69,17 +69,17 @@ function Playground() {
           {% endschema %}
         `;
         await session.filesystem.write(
-          '/Users/bankk/Developer/shopify-v0/e2b-playground/template/dawn/sections/section.liquid',
+          "/shopify-v0-template/dawn/sections/section.liquid",
           liquidCode
         );
       };
 
       await generateShopifyLiquidCode(session);
 
-      setURL('https://' + session.getHostname(3000));
+      setURL("https://" + session.getHostname(3000));
       setPlayground(session);
     } catch (error) {
-      logger.error('Failed to initialize E2B session:', error);
+      logger.error("Failed to initialize E2B session:", error);
     } finally {
       setLoading(false);
     }
@@ -97,12 +97,7 @@ function Playground() {
       {loading ? (
         <p>Loading...</p>
       ) : (
-        url && (
-          <iframe
-            className="w-full h-full rounded-md"
-            src={url}
-          />
-        )
+        url && <iframe className="w-full h-full rounded-md" src={url} />
       )}
     </div>
   );
