@@ -297,19 +297,39 @@ child.stderr.on("data", (chunk: Buffer) => {
 
 
 async function cloneRepo() {
-    return new Promise<void>((resolve, reject) => {
-      const clone = spawn('git', ['clone', 'https://github.com/YourUsername/YourRepo.git'], {
-        cwd: '/shopify-v0',
-      });
-  
-      clone.on('close', (code) => {
-        if(code !== 0) {
-          return reject(new Error(`Failed to clone repository with code ${code}`));
-        }
-        resolve();
-      });
-    });
-  }
+        return new Promise<void>((resolve, reject) => {
+          const commands = [
+            ['init'],
+            ['remote', 'add', 'origin', 'https://github.com/BankkRoll/shopify-v0.git'],
+            ['config', 'core.sparseCheckout', 'true'],
+            ['pull', 'origin', 'main'],
+            ['sparse-checkout', 'set', 'e2b-playground/template/dawn']
+          ];
+      
+          let i = 0;
+      
+          function executeCommand() {
+            if (i >= commands.length) {
+              return resolve();
+            }
+      
+            const cmd = spawn('git', commands[i], {
+              cwd: '/Users/bankk/Developer/shopify-v0/e2b-playground'
+            });
+      
+            cmd.on('close', (code) => {
+              if (code !== 0) {
+                return reject(new Error(`Failed at command ${commands[i].join(' ')} with code ${code}`));
+              }
+              i++;
+              executeCommand();
+            });
+          }
+      
+          executeCommand();
+        });
+      }
+      
 
 app.use(cors());
 app.use(bodyParser.json());
