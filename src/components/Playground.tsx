@@ -70,7 +70,7 @@ function Playground() {
         `;
         await session.filesystem.write(
           "e2b-playground/shopify-v0-template/dawn/sections/section.liquid",
-          liquidCode
+          liquidCode,
         );
       };
 
@@ -93,12 +93,24 @@ function Playground() {
   }, []);
 
   return (
-    <div className="w-full h-[600px] bg-red-500 rounded-md bg-zinc-300 p-4">
-      {loading ? (
-        <p>Loading...</p>
-      ) : (
-        url && <iframe className="w-full h-full rounded-md" src={url} />
-      )}
+    <div className="w-full h-[600px] bg-secondary rounded-md p-4">
+      {loading || !url ? (
+        <div className="absolute inset-0 flex justify-center items-center">
+          {loading ? (
+            <div className="flex space-x-3">
+              <div className="bg-foreground rounded-full h-3 w-3 animate-bounce"></div>
+              <div className="bg-foreground rounded-full h-3 w-3 animate-bounce200"></div>
+              <div className="bg-foreground rounded-full h-3 w-3 animate-bounce400"></div>
+            </div>
+          ) : (
+            <p className="text-foreground">
+              Sorry, unable to display playground.
+            </p>
+          )}
+        </div>
+      ) : null}
+
+      {url && <iframe className="w-full h-full rounded-md" src={url} />}
     </div>
   );
 }
