@@ -282,17 +282,6 @@ async function run(userTask: string, componentName: string) {
   );
 }
 
-async function cloneRepo() {
-  const session = await Session.create({
-    id: 'Nodejs',
-    apiKey: process.env.NEXT_PUBLIC_E2B_API_KEY!,
-  });
-  const proc = await session.process.start({
-    cmd: 'git clone https://github.com/BankkRoll/shopify-v0-template.git e2b-playground/shopify-v0-template',
-  });
-  await proc.finished;
-}
-
 app.post("/", async (req: Request, res: Response) => {
   const task: string = req.body.task;
   const componentName: string = req.body.componentName;
@@ -311,12 +300,15 @@ app.get("/", async (req: Request, res: Response) => {
 
 app.listen(3002, async () => {
   try {
-    await cloneRepo();
-
     const session = await Session.create({
       id: 'Nodejs',
       apiKey: process.env.NEXT_PUBLIC_E2B_API_KEY!,
     });
+
+    const proc = await session.process.start({
+      cmd: 'git clone https://github.com/BankkRoll/shopify-v0-template.git e2b-playground/shopify-v0-template',
+    });
+    await proc.finished;
 
     const installShopifyCLI = await session.process.start({
       cmd: 'npm install -g shopify-cli',
