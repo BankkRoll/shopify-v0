@@ -3,7 +3,7 @@
 > [!NOTE]  
 > Coming soon!
 
-![Screenshot 2023-10-08 171047](https://github.com/BankkRoll/shopify-v0/assets/106103625/af57b6f8-55c9-4bc8-9e98-ab20c893c9ff)
+![Screenshot 2023-10-12 154908](https://github.com/BankkRoll/shopify-v0/assets/106103625/6feaa9f7-8e69-4389-a833-fb36ef0dc478)
 
 ## Overview
 Welcome to Shopify-v0, a platform designed to generate advanced Shopify Liquid sections with ease. Powered by AI, our service allows you to quickly create custom Liquid sections for your Shopify store without the hassle of coding.
