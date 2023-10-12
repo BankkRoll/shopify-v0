@@ -196,6 +196,11 @@ function handleLiquidCode(components: LiquidComponents, componentName: string) {
 }
 
 async function run(userTask: string, componentName: string) {
+  const session = await Session.create({
+    id: 'Nodejs',
+    apiKey: process.env.NEXT_PUBLIC_E2B_API_KEY!,
+  });
+
   history.push({
     role: "user",
     content: userTask,
@@ -208,7 +213,6 @@ async function run(userTask: string, componentName: string) {
   });
 
   let choice = stream.choices[0];
-
   const liquidComponents: LiquidComponents = {
     styles: "",
     html: "",
@@ -271,119 +275,61 @@ async function run(userTask: string, componentName: string) {
     }
   }
   const finalLiquidCode = handleLiquidCode(liquidComponents, componentName);
-  fs.writeFileSync(
+
+  await session.filesystem.write(
     "e2b-playground/shopify-v0-template/dawn/sections/section.liquid",
     finalLiquidCode
   );
-  console.log("Liquid code written.");
 }
-
-const shopifyDevServer: ChildProcessWithoutNullStreams = spawn(
-  "shopify",
-  ["theme", "dev", "--store", "your-test-store.myshopify.com"],
-  {
-    cwd: "e2b-playground/shopify-v0-template/dawn",
-  }
-);
-
-shopifyDevServer.stderr.on("data", (chunk: Buffer) => {
-  const err: string = chunk.toString();
-  if (err.startsWith("- error")) {
-    console.error("Shopify Dev Server Error:", err);
-  }
-});
 
 async function cloneRepo() {
-  return new Promise<void>(async (resolve, reject) => {
-    try {
-      const session = await Session.create({
-        id: 'Nodejs',
-        apiKey: process.env.E2B_API_KEY,
-      });
-
-      let proc = await session.process.start({
-        cmd: 'git clone https://github.com/BankkRoll/shopify-v0-template e2b-playground/shopify-v0-template/dawn',
-        onStderr: data => console.log(data.line),
-        onStdout: data => console.log(data.line),
-      });
-
-      await proc.finished;
-
-      await session.close();
-
-      resolve();
-    } catch (error) {
-      if (error instanceof Error) {
-        reject(new Error(`Failed to clone repository: ${error.message}`));
-      } else {
-        reject(new Error('Failed to clone repository: Unknown error occurred'));
-      }
-    }
+  const session = await Session.create({
+    id: 'Nodejs',
+    apiKey: process.env.NEXT_PUBLIC_E2B_API_KEY!,
   });
+  const proc = await session.process.start({
+    cmd: 'git clone https://github.com/BankkRoll/shopify-v0-template.git e2b-playground/shopify-v0-template',
+  });
+  await proc.finished;
 }
-
-
-app.use(cors());
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
 
 app.post("/", async (req: Request, res: Response) => {
   const task: string = req.body.task;
   const componentName: string = req.body.componentName;
   await run(task, componentName);
-  res.send("");
+  res.send("Success");
 });
 
 app.get("/", async (req: Request, res: Response) => {
-  const code: string = fs.readFileSync(
-    "e2b-playground/shopify-v0-template/dawn/sections/section.liquid",
-    "utf8"
-  );
+  const session = await Session.create({
+    id: 'Nodejs',
+    apiKey: process.env.NEXT_PUBLIC_E2B_API_KEY!,
+  });
+  const code = await session.filesystem.read("e2b-playground/shopify-v0-template/dawn/sections/section.liquid");
   res.json({ code });
 });
 
 app.listen(3002, async () => {
   try {
-    // Clone the repo
     await cloneRepo();
-    console.log("Repository successfully cloned.");
 
-    // Install Shopify CLI
-    console.log("Installing Shopify CLI...");
-    const installShopifyCLI = spawn("npm", ["install", "-g", "shopify-cli"]);
-    installShopifyCLI.stdout.on("data", (data) => {
-      console.log(`stdout: ${data}`);
+    const session = await Session.create({
+      id: 'Nodejs',
+      apiKey: process.env.NEXT_PUBLIC_E2B_API_KEY!,
     });
-    installShopifyCLI.stderr.on("data", (data) => {
-      console.error(`stderr: ${data}`);
+
+    const installShopifyCLI = await session.process.start({
+      cmd: 'npm install -g shopify-cli',
     });
-    installShopifyCLI.on("close", (code) => {
-      if (code !== 0) {
-        console.error(
-          `Shopify CLI installation process exited with code ${code}`
-        );
-        return;
-      }
-      console.log("Shopify CLI successfully installed.");
+    await installShopifyCLI.finished;
 
-      // Start Shopify Dev Server
-      const shopifyDevServer: ChildProcessWithoutNullStreams = spawn(
-        "shopify",
-        ["theme", "dev", "--store", "your-test-store.myshopify.com"],
-        {
-          cwd: "e2b-playground/shopify-v0-template/dawn",
-        }
-      );
-
-      shopifyDevServer.stderr.on("data", (chunk: Buffer) => {
-        const err: string = chunk.toString();
-        if (err.startsWith("- error")) {
-          console.error("Shopify Dev Server Error:", err);
-        }
-      });
-
-      console.log("Server listening on port 3002!");
+    const shopifyDevServer = await session.process.start({
+      cmd: 'shopify theme dev --store your-test-store.myshopify.com',
+      cwd: 'e2b-playground/shopify-v0-template/dawn',
     });
+    await shopifyDevServer.finished;
+
+    console.log("Server listening on port 3002!");
   } catch (error) {
     console.error("Failed to start server:", error);
   }
