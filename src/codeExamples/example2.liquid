@@ -1,0 +1,253 @@
+{% comment %}
+--------------------------------------------------------------
+  Section Name: featured-blocks
+  Author: BankkRoll
+  Description: Interactive way to showcase featured products or items
+  GitHub: https://github.com/BankkRoll/Shopify-Section-Snippets
+  License: MIT
+--------------------------------------------------------------
+{% endcomment %}
+
+{%- style -%}
+.feature-promotion {
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+    background-color: {{ section.settings.section_bg_color }};
+}
+.feature-promotion-row {
+    display: {{ section.settings.layout }};
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: {{ section.settings.flex_alignment }};
+}
+.feature_box {
+    overflow: hidden;
+    border-radius: {{ section.settings.border_radius }}px;
+    box-shadow: {{ section.settings.box_shadow }};
+}
+.feature-promotion-row img {
+    max-width: 100%;
+    width: 100%;
+    display: block;
+    filter: brightness(0.9);
+    transition: 0.5s ease-in-out;
+}
+.feature-promotion-row .inner_box:hover img {
+    filter: brightness(1);
+    transform: scale(1.1);
+}
+.feature-promotion-row .col-md-4 {
+    flex: max(300px, 100%/3 - 20px);
+}
+.feature-promotion-row .inner_box {
+    position: relative;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+.feature-promotion-row .inner_box:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+}
+.feature-promotion-row .feature_content {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    z-index: 1;
+    text-align: {{ section.settings.text_alignment }};
+}
+.feature-promotion-row .feature_content h2 {
+    text-transform: capitalize;
+    font-size: 33px;
+    margin-bottom: 16px;
+    color: {{ block.settings.text_color }};
+    transition: color 0.3s ease;
+}
+.feature-promotion-row .feature_content a {
+    padding: 16px 24px;
+    display: inline-block;
+    line-height: 1;
+    font-size: 14px;
+    background-color: {{ block.settings.button_bg_color }};
+    color: {{ block.settings.button_text_color }};
+    border-radius: {{ block.settings.button_border_radius }};
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+{%- endstyle -%}
+
+<div class="feature-promotion">
+  <div class="feature-promotion-row">
+    {% for block in section.blocks %}
+    <div class="col-md-4">
+      <div class="feature_box" style="background-color: {{ block.settings.bg_color }}">
+        <div class="inner_box" onclick="window.location.href='{{block.settings.buttonlink}}'">
+          {% if block.settings.collection_img != blank %}
+          <img src="{{block.settings.collection_img | img_url: 'master'}}">
+          {% endif %}
+          <div class="feature_content" style="color: {{ block.settings.text_color }};">
+            {% if block.settings.collection_name != blank %}
+              <h2>{{block.settings.collection_name}}</h2>
+            {% endif %}
+            {% if block.settings.buttonlabel != blank %}
+              <a href="{{block.settings.buttonlink}}" style="background-color: {{ block.settings.button_bg_color }}; color: {{ block.settings.button_text_color }}; border-radius: {{ section.settings.button_border_radius }}px;">{{block.settings.buttonlabel}}</a>
+            {% endif %}
+          </div> 
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+
+{% schema %}
+{
+  "name": "Featured Boxes",
+  "class": "featured-boxes",
+  "max_blocks": 3,
+  "settings": [
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Padding Top",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "default": 20,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "button_border_radius",
+      "label": "Button Border Radius",
+      "min": 0,
+      "max": 50,
+      "step": 1,
+      "default": 8,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Padding Bottom",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "default": 20,
+      "unit": "px"
+    },
+    {
+      "type": "color",
+      "id": "section_bg_color",
+      "label": "Section Background Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "select",
+      "id": "flex_alignment",
+      "label": "Flexbox Alignment",
+      "options": [
+        {"value": "flex-start", "label": "Start"},
+        {"value": "center", "label": "Center"},
+        {"value": "flex-end", "label": "End"}
+      ],
+      "default": "flex-start"
+    },
+    {
+      "type": "select",
+      "id": "text_alignment",
+      "label": "Text Alignment",
+      "options": [
+        {"value": "left", "label": "Left"},
+        {"value": "center", "label": "Center"},
+        {"value": "right", "label": "Right"}
+      ],
+      "default": "left"
+    },
+    {
+      "type": "text",
+      "id": "box_shadow",
+      "label": "Box Shadow",
+      "default": "0px 4px 12px rgba(0, 0, 0, 0.1)"
+    },
+    {
+      "type": "range",
+      "id": "border_radius",
+      "label": "Border Radius",
+      "min": 0,
+      "max": 50,
+      "step": 1,
+      "default": 8,
+      "unit": "px"
+    },
+    {
+      "type": "select",
+      "id": "layout",
+      "label": "Layout",
+      "options": [
+        {"value": "flex", "label": "Row"},
+        {"value": "block", "label": "Column"}
+      ],
+      "default": "flex"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "Featured-Box",
+      "name": "Featured Box",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "collection_img",
+          "label": "Image",
+          "info": "800 x 500px .jpg recommended"
+        },
+        {
+          "type": "text",
+          "id": "collection_name",
+          "label": "Collection Title"
+        },
+        {
+          "type": "text",
+          "id": "buttonlabel",
+          "label": "Button Label"
+        },
+        {
+          "type": "url",
+          "id": "buttonlink",
+          "label": "Button Link"
+        },
+        {
+          "type": "color",
+          "id": "button_bg_color",
+          "label": "Button Background Color",
+          "default": "#000000"
+        },
+        {
+          "type": "color",
+          "id": "button_text_color",
+          "label": "Button Text Color",
+          "default": "#ffffff"
+        },
+        {
+          "type": "color",
+          "id": "bg_color",
+          "label": "Background Color",
+          "default": "#ffffff"
+        },
+        {
+          "type": "color",
+          "id": "text_color",
+          "label": "Text Color",
+          "default": "#000000"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Featured Box",
+      "category": "Home",
+      "blocks": []
+    }
+  ]
+}
+{% endschema %}
