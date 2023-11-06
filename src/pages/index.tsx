@@ -38,7 +38,7 @@ export default function Home() {
   ];
 
   function sendRequest() {
-    fetch("http://localhost:3002", {
+    fetch("http://localhost:3001", {
       method: "POST",
       headers: {
         "Content-type": "application/json",

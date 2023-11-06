@@ -38,7 +38,7 @@ const Examples: React.FC = () => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
       {exampleData.map((example) => (
-        <Link key={example.id} href={`/example/${example.id}`}>
+        <Link key={example.id} href={`/${example.id}`}>
           <Card className="cursor-pointer hover:shadow-lg hover:shadow-foreground transition duration-200">
             <CardImage src={example.img} alt={`${example.title} image`} />
             <CardHeader>
