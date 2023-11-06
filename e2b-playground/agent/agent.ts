@@ -8,7 +8,12 @@ import cors from "cors";
 import { functions } from "./functions";
 import { Session } from "@e2b/sdk";
 
+
+const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
+const E2B_API_KEY = process.env.NEXT_PUBLIC_E2B_API_KEY;
+
 const app = express();
+app.use(cors());
 
 interface IHistory {
   role: "system" | "user" | "assistant";
@@ -156,9 +161,8 @@ const history: IHistory[] = [
   },
 ];
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY!,
-});
+const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
+
 let errors: string = "";
 
 function handleLiquidCode(components: LiquidComponents, componentName: string) {
@@ -196,9 +200,10 @@ function handleLiquidCode(components: LiquidComponents, componentName: string) {
 }
 
 async function run(userTask: string, componentName: string) {
+  console.log('Starting session...');
   const session = await Session.create({
     id: 'Nodejs',
-    apiKey: process.env.NEXT_PUBLIC_E2B_API_KEY!,
+    apiKey: E2B_API_KEY,
   });
 
   history.push({
@@ -276,10 +281,31 @@ async function run(userTask: string, componentName: string) {
   }
   const finalLiquidCode = handleLiquidCode(liquidComponents, componentName);
 
-  await session.filesystem.write(
-    "e2b-playground/shopify-v0-template/dawn/sections/section.liquid",
-    finalLiquidCode
-  );
+  // Directory checking and creation logic
+  const dirPath = "e2b-playground/shopify-v0-template/dawn/sections";
+  const filePath = `${dirPath}/section.liquid`;
+
+  try {
+    // Attempt to read the directory to check if it exists
+    await session.filesystem.read(dirPath);
+  } catch (error) {
+    // If an error occurs, assume the directory doesn't exist and try to create it
+    try {
+      await session.filesystem.makeDir(dirPath);
+      console.log(`Directory created at ${dirPath}`);
+    } catch (mkdirError) {
+      console.error(`Error creating directory at ${dirPath}:`, mkdirError);
+      return; // Exit the function if directory creation fails
+    }
+  }
+
+  // Proceed to write the file now that the directory is confirmed to exist
+  try {
+    await session.filesystem.write(filePath, finalLiquidCode);
+    console.log(`Successfully wrote file to ${filePath}`);
+  } catch (writeError) {
+    console.error(`Error writing file to ${filePath}:`, writeError);
+  }
 }
 
 app.post("/", async (req: Request, res: Response) => {
@@ -292,34 +318,34 @@ app.post("/", async (req: Request, res: Response) => {
 app.get("/", async (req: Request, res: Response) => {
   const session = await Session.create({
     id: 'Nodejs',
-    apiKey: process.env.NEXT_PUBLIC_E2B_API_KEY!,
+    apiKey: "e2b_8210ad33057d6fa224fbd0716b4fb1da43205f15",
   });
   const code = await session.filesystem.read("e2b-playground/shopify-v0-template/dawn/sections/section.liquid");
   res.json({ code });
 });
 
-app.listen(3002, async () => {
+app.listen(3001, async () => {
   try {
     const session = await Session.create({
       id: 'Nodejs',
-      apiKey: process.env.NEXT_PUBLIC_E2B_API_KEY!,
+      apiKey: "e2b_8210ad33057d6fa224fbd0716b4fb1da43205f15",
     });
 
     const proc = await session.process.start({
       cmd: 'git clone https://github.com/BankkRoll/shopify-v0-template.git e2b-playground/shopify-v0-template',
     });
-    await proc.finished;
+    await proc.wait;
 
     const installShopifyCLI = await session.process.start({
       cmd: 'npm install -g shopify-cli',
     });
-    await installShopifyCLI.finished;
+    await installShopifyCLI.wait;
 
     const shopifyDevServer = await session.process.start({
       cmd: 'shopify theme dev --store your-test-store.myshopify.com',
       cwd: 'e2b-playground/shopify-v0-template/dawn',
     });
-    await shopifyDevServer.finished;
+    await shopifyDevServer.wait;
 
     console.log("Server listening on port 3002!");
   } catch (error) {
