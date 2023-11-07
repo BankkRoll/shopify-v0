@@ -318,7 +318,7 @@ app.post("/", async (req: Request, res: Response) => {
 app.get("/", async (req: Request, res: Response) => {
   const session = await Session.create({
     id: 'Nodejs',
-    apiKey: "e2b_8210ad33057d6fa224fbd0716b4fb1da43205f15",
+    apiKey: E2B_API_KEY,
   });
   const code = await session.filesystem.read("e2b-playground/shopify-v0-template/dawn/sections/section.liquid");
   res.json({ code });
@@ -328,7 +328,7 @@ app.listen(3001, async () => {
   try {
     const session = await Session.create({
       id: 'Nodejs',
-      apiKey: "e2b_8210ad33057d6fa224fbd0716b4fb1da43205f15",
+      apiKey: E2B_API_KEY,
     });
 
     const proc = await session.process.start({
